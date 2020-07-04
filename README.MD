@@ -5,7 +5,10 @@ Current documentation :
 
 This repo shows an exmaple of a working Glob/Loc Blazor project.
 
-Things to look at:
+Try it out: https://blazorcultures.azurewebsites.net/
+( Azure free tier, so don't expect speed! )
+
+### Things to look at:
 
 #### Enabling Localisation in startup.cs
 ##### Line 32 - add localization and tell it where to find the resx files
