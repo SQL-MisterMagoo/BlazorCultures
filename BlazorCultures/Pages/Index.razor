@@ -1,0 +1,26 @@
+﻿@page "/"
+@inject Microsoft.Extensions.Localization.IStringLocalizer<Index> text
+
+<h1>@text["Hello, world!"]</h1>
+
+<div>Culture: @System.Globalization.CultureInfo.CurrentCulture.DisplayName</div>
+<div>Time: @DateTime.UtcNow.AddMinutes(Offset).ToString()</div>
+<div>Offset: @Offset minutes</div>
+@code
+{
+    [CascadingParameter(Name = "TimeOffset")] public int Offset { get; set; }
+
+    Task clock;
+    protected override void OnAfterRender(bool firstRender)
+    {
+        clock = ClockTick();
+    }
+    async Task ClockTick()
+    {
+        while(true)
+        { 
+            await Task.Delay(1000); StateHasChanged(); 
+        }
+    }
+    //
+}

@@ -1,0 +1,55 @@
+﻿@inherits LayoutComponentBase
+@using System.Globalization
+@using Microsoft.AspNetCore.Localization
+
+<div class="sidebar">
+    <NavMenu />
+</div>
+
+<div class="main">
+    <div class="top-row px-4">
+        <select @bind="SelectedCulture" >
+            @foreach (var item in CultureInfo
+                .GetCultures(System.Globalization.CultureTypes.AllCultures)
+                .Where(c=> c.Name=="en-GB" || c.Name=="en-US" || c.Name=="fr")
+                .OrderBy(c=>c.DisplayName)
+                )
+            {
+                <option value=@item.Name selected="@item.Equals(CultureInfo.CurrentCulture)">@item.DisplayName</option>
+            }
+        </select>
+        <a href="https://docs.microsoft.com/aspnet/" target="_blank">About</a>
+    </div>
+
+    <div class="content px-4">
+        @Body
+    </div>
+</div>
+@code {
+    [Inject] IJSRuntime JS { get; set; }
+    [Inject] NavigationManager NAV { get; set; }
+
+    string _selectedCulture = CultureInfo.CurrentCulture.Name;
+    string SelectedCulture
+    {
+        get => _selectedCulture;
+        set
+        {
+            if (value != _selectedCulture)
+            {
+                _selectedCulture = value;
+                InvokeAsync(() => ChangeCulture(value));
+            }
+        }
+    }
+    async Task ChangeCulture(string culture)
+    {
+        CultureInfo.CurrentCulture = CultureInfo.GetCultureInfo(culture);
+        CultureInfo.CurrentUICulture = CultureInfo.GetCultureInfo(culture);
+        var cn = CookieRequestCultureProvider.DefaultCookieName;
+        var cv = CookieRequestCultureProvider.MakeCookieValue(new RequestCulture(culture));
+        var cookie = $"{cn}={cv}";
+        await JS.InvokeVoidAsync("eval", $"document.cookie='{cookie}'");
+        NAV.NavigateTo(NAV.Uri,true);
+    }
+}
